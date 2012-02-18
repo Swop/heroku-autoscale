@@ -1,0 +1,3 @@
+[submodule "heroku"]
+	path = heroku
+	url = https://github.com/heroku/heroku.py.git
