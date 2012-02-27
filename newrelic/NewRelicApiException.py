@@ -8,6 +8,14 @@ class NewRelicApiException(Exception):
         
         errors = dom.getElementsByTagName("error")
         for error in errors:
-            all_errors += error
-                
+            all_errors += self._getNodelistText(error.childNodes)
+        
+        print(all_errors)
         Exception.__init__(self, all_errors)
+        
+    def _getNodelistText(self, nodelist):
+        rc = []
+        for node in nodelist:
+            if node.nodeType == node.TEXT_NODE:
+                rc.append(node.data)
+        return ' - '.join(rc)
