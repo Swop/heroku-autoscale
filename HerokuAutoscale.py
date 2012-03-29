@@ -24,7 +24,7 @@ class HerokuAutoscale:
     Parse the config file and manage the number of dynos through time with regular checks using NewRelic API.
     """
     def __init__(self, config_file = "config.ini"):
-        """Initialise the deamon with the given config file.
+        """Initialise the daemon with the given config file.
         
         Argument:
         - config_file: (optional, default = "config.ini") The configuration file to use.

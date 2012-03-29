@@ -5,7 +5,7 @@
 #
 
 # !! CHANGE THIS LINE WITH YOUR REAL DEAMON'S PATH !!
-DAEMON_EXEC="/home/sylvain/Projets/Heroku/heroku-autoscale/HerokuAutoscaleDeamon.py"
+DAEMON_EXEC="/home/sylvain/Projets/Heroku/heroku-autoscale/HerokuAutoscaleDaemon.py"
 
 PID_LOCK_FILE="/var/run/heroku-autoscale.pid"
 

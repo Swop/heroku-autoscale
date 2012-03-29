@@ -2,7 +2,7 @@
 
 
 ## An autoscaling python script for Heorku
-This script use [Heroku official python API](https://github.com/heroku/heroku.py) to automatically scale your Heroku app depending on the dinho's load.
+This python daemon use [Heroku official python API](https://github.com/heroku/heroku.py) and [New Relic API](http://newrelic.com/) to automatically scale your Heroku app depending on the dinho's load.
 
 **You first need to install Heroku API before playing with this script.**
 

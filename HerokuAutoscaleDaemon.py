@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-"""This module define the HerokuAutoscaleDeamon class 
+"""This module define the HerokuAutoscaleDaemon class 
 """
 
 import sys
@@ -14,7 +14,7 @@ from logger import Logger
 from pyUnixDaemon import pyUnixDaemon
 
 def singleton(cls):
-    """Return a singleton of the HerokuAutoscaleDeamon class
+    """Return a singleton of the HerokuAutoscaleDaemon class
     """
     instances = {}
     def getinstance(*args, **kwargs):
@@ -25,22 +25,22 @@ def singleton(cls):
 
 
 @singleton
-class HerokuAutoscaleDeamon(pyUnixDaemon):
-    """The Heroku Autoscale engine's deamon
-    This class manage the launch and the stop of the deamon.
+class HerokuAutoscaleDaemon(pyUnixDaemon):
+    """The Heroku Autoscale engine's daemon
+    This class manage the launch and the stop of the daemon.
     """    
     def __init__(self, options):
-        """Initilaize the deamon.
+        """Initilaize the daemon.
         
         Argument:
         - options : a dictionary composed with these required elements:
-            - uid: the linux UID used by the deamon
-            - gid: the linux GID used by the deamon
-            - lockpidfile: the PID lock file path to store the PID of the running deamon
+            - uid: the linux UID used by the daemon
+            - gid: the linux GID used by the daemon
+            - lockpidfile: the PID lock file path to store the PID of the running daemon
             - outputfile: the info log file path to use
             - errorfile: the error log file path to use
             - configfile: the config file to use to tweek the engine's behaviour (see the HAConf class)
-            - status_file: (Currently unused) the status file to use to store some info about the running deamon
+            - status_file: (Currently unused) the status file to use to store some info about the running daemon
         """
         self._uid = options['uid']
         self._gid = options['gid']
@@ -55,7 +55,7 @@ class HerokuAutoscaleDeamon(pyUnixDaemon):
         self.processes = []
         
     def _run(self):
-        """Start the deamon
+        """Start the daemon
         
         The demon will start the HerokuAutoscale engine's mail loop
         """
@@ -120,10 +120,10 @@ def processArgs():
     return options
 
 def usage():
-    """Print the usage of the deamon CLI launcher"""
+    """Print the usage of the daemon CLI launcher"""
      
     print """
-    Usage: HerokuAutoscaleDeamon [OPTIONS]
+    Usage: HerokuAutoscaleDaemon [OPTIONS]
          -h, --help                          Display this usage message
          -u, --uid=userid                    User id to bind daemon to (default: 1002).
          -g, --gid=groupid                   Group id to bind daemon to (default: 1002).
@@ -135,5 +135,5 @@ def usage():
 
 if __name__ == "__main__":
     options = processArgs()
-    daemon = HerokuAutoscaleDeamon(options)
+    daemon = HerokuAutoscaleDaemon(options)
     daemon.launch()
