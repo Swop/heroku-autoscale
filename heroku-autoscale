@@ -1,0 +1,106 @@
+#!/bin/bash
+#
+# heroku-autoscale  This shell script takes care of starting and stopping
+#                   the Heroku Autoscale daemon
+#
+
+# !! CHANGE THIS LINE WITH YOUR REAL DEAMON'S PATH !!
+DAEMON_EXEC="/home/sylvain/Projets/Heroku/heroku-autoscale/HerokuAutoscaleDeamon.py"
+
+PID_LOCK_FILE="/var/run/heroku-autoscale.pid"
+
+case "$1" in
+  start)
+    if [[ $EUID -ne 0 ]]; then
+      echo "You must be a root user" 2>&1
+      exit 1
+    fi
+    
+    echo "Starting Heroku Autoscale daemon: "
+    shift
+    exec /usr/bin/python ${DAEMON_EXEC} $*
+    ;;
+
+  stop)
+    if [[ $EUID -ne 0 ]]; then
+      echo "You must be a root user" 2>&1
+      exit 1
+    fi
+    
+    echo "Shutting down Heroku Autoscale daemon: "
+    if [ -f ${PID_LOCK_FILE} ]; then
+      PID=`cat ${PID_LOCK_FILE}`
+      if [ ! -e /proc/${PID} ]
+      then
+         echo "The process #${PID} is not running." 2>&1
+         echo "Are you sure the daemon is started ?" 2>&1
+         echo "Deleting the lock file ${PID_LOCK_FILE}."
+         rm $PID_LOCK_FILE
+         exit
+      fi
+      kill $PID
+    else
+      echo "PID not found (at ${PID_LOCK_FILE})" 2>&1
+      echo "Are you sure that the daemon is running ?" 2>&1
+    fi
+    ;;
+
+  status)
+    if [ -f ${PID_LOCK_FILE} ]; then
+      # Read the process ID if exists
+      PID=`cat ${PID_LOCK_FILE}`
+      if [ ! -e /proc/${PID} ]
+      then
+        echo "The process #${PID} is not running but the lock does exist." 2>&1
+        echo "Deleting the lock file ${PID_LOCK_FILE}."
+        rm $PID_LOCK_FILE
+        exit
+      fi
+      echo "The daemon is running on pid ${PID}."
+      # exec /usr/bin/python "/usr/share/backup/status.py"
+    else
+      echo "The daemon seems stopped. The lock ${PID_LOCK_FILE} doesn't exist."
+    fi
+    ;;
+
+  restart)
+    if [[ $EUID -ne 0 ]]; then
+      echo "You must be a root user" 2>&1
+      exit 1
+    fi
+    
+    $0 stop
+    $0 start
+    ;;
+
+  reload)
+    if [[ $EUID -ne 0 ]]; then
+      echo "You must be a root user" 2>&1
+      exit 1
+    fi
+    
+    if [ -f ${PID_LOCK_FILE} ]; then
+      # Read the process ID if exists
+      PID=`cat ${PID_LOCK_FILE}`
+      if [ ! -e /proc/${PID} ]
+      then
+        echo "The process #${PID} is not running but the lock does exist." 2>&1
+        echo "Deleting the lock file ${PID_LOCK_FILE}."
+        rm $PID_LOCK_FILE
+        exit
+      fi
+      echo "Reloading the configuration..."
+      kill -s HUP $PID
+    else
+      echo "The daemon seems stopped. The lock ${PID_LOCK_FILE} doesn't exist."
+    fi
+    ;;
+
+  *)
+    echo "Usage: $0 {start|stop|status|reload|restart}"
+    exit 1
+    ;;
+
+esac
+
+exit 0

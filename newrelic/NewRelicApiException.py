@@ -1,7 +1,8 @@
 import xml.dom.minidom
 
 class NewRelicApiException(Exception):
-
+    """Exception raised when an error occurs during the communication with the New Relic REST API.
+    """ 
     def __init__(self, xml_response):
         all_errors = ""
         dom = xml.dom.minidom.parseString(xml_response)

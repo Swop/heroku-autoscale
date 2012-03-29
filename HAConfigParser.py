@@ -3,9 +3,19 @@ from ConfigException import ConfigException
 from HAConf import HAConf
 
 class HAConfigParser:
+    """This class is used to parse the config file and create an HAConf object
     
+    The HAConf object is created and reflects the parameters used into the config file
+    """
     @staticmethod
     def loadConf(config_file = "config.ini"):
+        """Load and parse the given config file.
+        
+        Argument:
+        - config_file: (optional, default: config.ini) The config file's path to parse
+        
+        Return: An HAConf obejct (see HAConf.py)
+        """
         config = ConfigParser.RawConfigParser()
         config.readfp(open(config_file))
                 
@@ -19,6 +29,12 @@ class HAConfigParser:
     
     @staticmethod
     def _loadHerokuConf(config, ha_conf):
+        """Load scpecific infos about Heroku settings
+        
+        Arguments:
+        - config: the config file, allready opened by a ConfigParser.RawConfigParser
+        - ha_conf: An intanciated HAConf object to write infos into
+        """
         if(not config.has_section('HEROKU_INFOS')):
             raise ConfigException('Config file must have a HEROKU_INFOS section')
         
@@ -34,6 +50,12 @@ class HAConfigParser:
         
     @staticmethod
     def _loadNewRelicConf(config, ha_conf):
+        """Load scpecific infos about NewRelic settings
+        
+        Arguments:
+        - config: the config file, allready opened by a ConfigParser.RawConfigParser
+        - ha_conf: An intanciated HAConf object to write infos into
+        """
         if(not config.has_section('NEWRELIC_INFOS')):
             raise ConfigException('Config file must have a NEWRELIC_INFOS section')
         
@@ -54,6 +76,12 @@ class HAConfigParser:
     
     @staticmethod
     def _loadAutoscaleSettings(config, ha_conf):
+        """Load scpecific infos about Autoscale settings
+        
+        Arguments:
+        - config: the config file, allready opened by a ConfigParser.RawConfigParser
+        - ha_conf: An intanciated HAConf object to write infos into
+        """
         if(config.has_section("AUTOSCALE_SETTINGS")):
             if(config.has_option('AUTOSCALE_SETTINGS', 'min_dynos')):
                 ha_conf.setMinDynos(config.getint('AUTOSCALE_SETTINGS', 'min_dynos'))
