@@ -1,9 +1,11 @@
 #!/usr/bin/python
 
+"""This module define the HerokuAutoscaleDeamon class 
+"""
+
 import sys
 import getopt
 import signal
-#import traceback
 from datetime import datetime
 from os import getpid
 
@@ -12,6 +14,8 @@ from logger import Logger
 from pyUnixDaemon import pyUnixDaemon
 
 def singleton(cls):
+    """Return a singleton of the HerokuAutoscaleDeamon class
+    """
     instances = {}
     def getinstance(*args, **kwargs):
         if cls not in instances:
@@ -21,8 +25,23 @@ def singleton(cls):
 
 
 @singleton
-class HerokuAutoscaleDeamon(pyUnixDaemon):    
+class HerokuAutoscaleDeamon(pyUnixDaemon):
+    """The Heroku Autoscale engine's deamon
+    This class manage the launch and the stop of the deamon.
+    """    
     def __init__(self, options):
+        """Initilaize the deamon.
+        
+        Argument:
+        - options : a dictionary composed with these required elements:
+            - uid: the linux UID used by the deamon
+            - gid: the linux GID used by the deamon
+            - lockpidfile: the PID lock file path to store the PID of the running deamon
+            - outputfile: the info log file path to use
+            - errorfile: the error log file path to use
+            - configfile: the config file to use to tweek the engine's behaviour (see the HAConf class)
+            - status_file: (Currently unused) the status file to use to store some info about the running deamon
+        """
         self._uid = options['uid']
         self._gid = options['gid']
         self._lockpidfile = options['lockpidfile']
@@ -36,6 +55,10 @@ class HerokuAutoscaleDeamon(pyUnixDaemon):
         self.processes = []
         
     def _run(self):
+        """Start the deamon
+        
+        The demon will start the HerokuAutoscale engine's mail loop
+        """
         self._app_pid = getpid()
         print "** Starting Heroku Autoscale daemon... PID: {0} **".format(self._app_pid)
         
@@ -43,19 +66,8 @@ class HerokuAutoscaleDeamon(pyUnixDaemon):
         # This signal will be used to reload the configuration file
         signal.signal(signal.SIGHUP, self.reloadConfiguration)
         try:
-            #self._oldTime = datetime(1970, 1, 1, 0, 0)
-            #print "** Parsing conf file : {0} **".format(self._configfile)
-            #self._backupSet = parser.parse(self._configfile)
-            #elf._mainLoop()
-            #server = Server(("", 8080))
-            #server.serve_forever()
             ha = HerokuAutoscale(self._configfile)
             ha.autoscale_forever()
-            
-        #except ValueError:
-        #    print >> sys.stderr, traceback.format_exc()
-        #    print >> sys.stderr, "Error in timing description. Stopping daemon..."
-        #    return
         finally:
             if getpid() == self._app_pid:
                 print "** Stoping Heroku Autoscale daemon... PID: {0} **".format(getpid())
@@ -63,9 +75,11 @@ class HerokuAutoscaleDeamon(pyUnixDaemon):
     
     def reloadConfiguration(self, sig=None, frame=None):
         """Reload the configuration."""
-        #parser.parse(self._backupSet._configPath, self._backupSet)
+        #TODO
+        pass
 
 def processArgs():
+    """Process the input CLI args"""
     try:
         opts, args = getopt.getopt(sys.argv[1:], "hu:g:o:e:c:s:", ["help", "uid=", "gid=", "outputfile=", "errorfile=", "config=", "lockpidfile=", "status-file="])
     except getopt.GetoptError, err:
@@ -106,6 +120,8 @@ def processArgs():
     return options
 
 def usage():
+    """Print the usage of the deamon CLI launcher"""
+     
     print """
     Usage: HerokuAutoscaleDeamon [OPTIONS]
          -h, --help                          Display this usage message

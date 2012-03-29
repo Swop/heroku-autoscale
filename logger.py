@@ -6,8 +6,6 @@ will be writen in a file.
 
 """
 
-import sys
-
 from datetime import datetime
 
 class Logger:

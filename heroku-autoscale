@@ -1,10 +1,12 @@
 #!/bin/bash
 #
-# backup     This shell script takes care of starting and stopping
-#               the Heroku Autoscale daemon
+# heroku-autoscale  This shell script takes care of starting and stopping
+#                   the Heroku Autoscale daemon
 #
 
+# !! CHANGE THIS LINE WITH YOUR REAL DEAMON'S PATH !!
 DAEMON_EXEC="/home/sylvain/Projets/Heroku/heroku-autoscale/HerokuAutoscaleDeamon.py"
+
 PID_LOCK_FILE="/var/run/heroku-autoscale.pid"
 
 case "$1" in
