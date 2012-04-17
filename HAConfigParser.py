@@ -22,7 +22,7 @@ class HAConfigParser:
         ha_conf = HAConf()
         
         HAConfigParser._loadHerokuConf(config, ha_conf)
-        HAConfigParser._loadNewRelicConf(config, ha_conf)
+        HAConfigParser._loadPingdomConf(config, ha_conf)
         HAConfigParser._loadAutoscaleSettings(config, ha_conf)
         
         return ha_conf
@@ -49,30 +49,25 @@ class HAConfigParser:
             raise ConfigException("You must provide a Heroku App name (section 'HEROKU_INFOS', key 'app_name')")
         
     @staticmethod
-    def _loadNewRelicConf(config, ha_conf):
-        """Load scpecific infos about NewRelic settings
+    def _loadPingdomConf(config, ha_conf):
+        """Load scpecific infos about Pingdom settings
         
         Arguments:
         - config: the config file, allready opened by a ConfigParser.RawConfigParser
         - ha_conf: An intanciated HAConf object to write infos into
         """
-        if(not config.has_section('NEWRELIC_INFOS')):
-            raise ConfigException('Config file must have a NEWRELIC_INFOS section')
+        if(not config.has_section('PINGDOM_INFOS')):
+            raise ConfigException('Config file must have a PINGDOM_INFOS section')
         
-        if(config.has_option('NEWRELIC_INFOS', 'api_key')):
-            ha_conf.setNewRelicAPIKey(config.get('NEWRELIC_INFOS', 'api_key'))
+        if(config.has_option('PINGDOM_INFOS', 'api_key')):
+            ha_conf.setPingdomAPIKey(config.get('PINGDOM_INFOS', 'api_key'))
         else:
-            raise ConfigException("You must provide a New Relic API Key (section 'NEWRELIC_INFOS', key 'api_key')")
+            raise ConfigException("You must provide a Pingdom API Key (section 'PINGDOM_INFOS', key 'api_key')")
         
-        if(config.has_option('NEWRELIC_INFOS', 'account_id')):
-            ha_conf.setNewRelicAccountId(config.get('NEWRELIC_INFOS', 'account_id'))
+        if(config.has_option('PINGDOM_INFOS', 'check_id')):
+            ha_conf.setPingdomCheckId(config.get('PINGDOM_INFOS', 'check_id'))
         else:
-            raise ConfigException("You must provide a New Relic Account ID (section 'NEWRELIC_INFOS', key 'account_id')")
-        
-        if(config.has_option('NEWRELIC_INFOS', 'app_id')):
-            ha_conf.setNewRelicAppId(config.get('NEWRELIC_INFOS', 'app_id'))
-        else:
-            raise ConfigException("You must provide a New Relic App ID (section 'NEWRELIC_INFOS', key 'app_id')")
+            raise ConfigException("You must provide a Pingdom check ID (section 'PINGDOM_INFOS', key 'check_id')")
     
     @staticmethod
     def _loadAutoscaleSettings(config, ha_conf):
@@ -87,9 +82,15 @@ class HAConfigParser:
                 ha_conf.setMinDynos(config.getint('AUTOSCALE_SETTINGS', 'min_dynos'))
             if(config.has_option('AUTOSCALE_SETTINGS', 'max_dynos')):
                 ha_conf.setMaxDynos(config.getint('AUTOSCALE_SETTINGS', 'max_dynos'))
-            if(config.has_option('AUTOSCALE_SETTINGS', 'apdex_low')):
-                ha_conf.setApdexLowScore(config.getfloat('AUTOSCALE_SETTINGS', 'apdex_low'))
-            if(config.has_option('AUTOSCALE_SETTINGS', 'apdex_high')):
-                ha_conf.setApdexHighScore(config.getfloat('AUTOSCALE_SETTINGS', 'apdex_high'))
+            if(config.has_option('AUTOSCALE_SETTINGS', 'response_time_low')):
+                ha_conf.setResponseTimeLow(config.getfloat('AUTOSCALE_SETTINGS', 'response_time_low'))
+            if(config.has_option('AUTOSCALE_SETTINGS', 'response_time_high')):
+                ha_conf.setResponseTimeHigh(config.getfloat('AUTOSCALE_SETTINGS', 'response_time_high'))
             if(config.has_option('AUTOSCALE_SETTINGS', 'check_frequency')):
                 ha_conf.setCheckFrequency(config.getfloat('AUTOSCALE_SETTINGS', 'check_frequency'))
+            if(config.has_option('AUTOSCALE_SETTINGS', 'pingdom_check_period')):
+                ha_conf.setCheckFrequency(config.getfloat('AUTOSCALE_SETTINGS', 'pingdom_check_period'))
+            if(config.has_option('AUTOSCALE_SETTINGS', 'time_response_trend_low')):
+                ha_conf.setResponseTimeTrendLow(config.getfloat('AUTOSCALE_SETTINGS', 'response_time_trend_low'))
+            if(config.has_option('AUTOSCALE_SETTINGS', 'time_response_trend_high')):
+                ha_conf.setResponseTimeTrendHigh(config.getfloat('AUTOSCALE_SETTINGS', 'response_time_trend_high'))
