@@ -2,6 +2,7 @@ from __future__ import print_function
 
 import heroku
 import signal, sys, time
+from Plot import Plot
 from HAConfigParser import HAConfigParser
 from pingdom.pingdomapi import PingdomAPIWrapper
 from datetime import datetime, timedelta
@@ -19,7 +20,7 @@ def logerr(msg):
     sys.stderr.flush()
 
 class HerokuAutoscale:
-    """Main class of the Heroku Atoscale engine. Manage the dyno scaling during time.
+    """Main class of the Heroku Autoscale engine. Manage the dyno scaling during time.
     
     Parse the config file and manage the number of dynos through time with regular checks using Pingdom API.
     """
@@ -30,7 +31,9 @@ class HerokuAutoscale:
         - config_file: (optional, default = "config.ini") The configuration file to use.
         """
         self._conf = HAConfigParser.loadConf(config_file)
-        self._pd_wrapper = PingdomAPIWrapper(self._conf.getPingdomAPIKey(), self._conf.getPingdomCheckId())
+        self._pd_wrapper = PingdomAPIWrapper(self._conf.getPingdomAPIKey(),
+                                             self._conf.getPingdomLogin(),
+                                             self._conf.getPingdomPassword())
         
         hrk_cloud = heroku.from_key(self._conf.getHerokuAPIKey())
         self._heroku_app = hrk_cloud.apps[self._conf.getHerokuAppName()]
@@ -55,6 +58,8 @@ class HerokuAutoscale:
         rep_time_trend = self._getResponseTimeTrend(checks)
         self._log("resp time trend: {0}".format(rep_time_trend))
         
+        Plot.plot(checks, rep_time_avg, rep_time_trend, self._conf.getResponseTimeLow(), self._conf.getResponseTimeHigh())
+        
         if(rep_time_avg < self._conf.getResponseTimeLow()):
             if(rep_time_trend < 0):
                 self._removeDyno()
@@ -62,9 +67,11 @@ class HerokuAutoscale:
                 self._log("Do nothing...")
         elif(rep_time_avg >= self._conf.getResponseTimeLow() and 
              rep_time_avg < self._conf.getResponseTimeHigh()):
-            if(rep_time_trend > self._conf.getResponseTimeTrendHigh()):
+            
+            delta_rep_time_bounds = self._conf.getResponseTimeHigh() - self._conf.getResponseTimeLow()
+            if(rep_time_trend > self._conf.getResponseTimeTrendHigh() * delta_rep_time_bounds):
                 self._addDyno()
-            elif(rep_time_trend < self._conf.getResponseTimeTrendLow()):
+            elif(rep_time_trend < -1. * (self._conf.getResponseTimeTrendLow() * delta_rep_time_bounds)):
                 self._removeDyno()
             else:
                 self._log("Do nothing...")
@@ -141,7 +148,7 @@ class HerokuAutoscale:
         for time in times:
             check = checks[time]
             avg += check.get_response_time()
-        avg /= len(checks.keys)
+        avg /= len(checks.keys())
         return avg
         
     def _getResponseTimeTrend(self, checks):
@@ -153,7 +160,7 @@ class HerokuAutoscale:
         times = checks.keys()
         times.sort()
         
-        check_count = len(checks.keys)
+        check_count = len(checks.keys())
         
         global_coef = 0
         for i in range(check_count-1):

@@ -1,1 +1,0 @@
-import pingdomapi.PingdomAPIWrapper

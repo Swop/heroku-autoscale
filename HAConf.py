@@ -13,16 +13,18 @@ class HAConf:
                        'app_name': ''
         }
         self._pingdom = {'api_key': '',
-                          'check_id': ''
+                         'login' : '',
+                         'password': '',
+                         'check_id': ''
         }
         self._autoscale_settings = {'min_dynos': 1,
                                    'max_dynos': 10,
-                                   'response_time_low': 500,
+                                   'response_time_low': 200,
                                    'response_time_high': 2000,
                                    'check_frequency': 5,
                                    'pingdom_check_period': 30,
                                    'response_time_trend_low': -0.5,
-                                   'response_time_trend_high': 0.5  
+                                   'response_time_trend_high': 0.5
         }
     
     def setHerokuAPIKey(self, heroku_api_key):
@@ -69,6 +71,36 @@ class HAConf:
         Return: The Pingdom API Key
         """
         return self._pingdom['api_key']
+    
+    def setPingdomLogin(self, pingdom_login):
+        """Set the Pingdom login
+        
+        Argument:
+        - pingdom_login: The Pingdom login (email)
+        """
+        self._pingdom['login'] = pingdom_login
+    
+    def getPingdomLogin(self):
+        """Get the Pingdom login
+        
+        Return: The Pingdom login
+        """
+        return self._pingdom['login']
+    
+    def setPingdomPassword(self, pingdom_password):
+        """Set the Pingdom password
+        
+        Argument:
+        - pingdom_password: The Pingdom password
+        """
+        self._pingdom['password'] = pingdom_password
+    
+    def getPingdomPassword(self):
+        """Get the Pingdom password
+        
+        Return: The Pingdom password
+        """
+        return self._pingdom['password']
     
     def setPingdomCheckId(self, pingdom_check_id):
         """Set the Pingdom check ID
@@ -133,7 +165,7 @@ class HAConf:
         Argument:
         - response_time_low: The response time Low Score
         """
-        if(isinstance(response_time_low, int) and response_time_low >= 0):
+        if(response_time_low >= 0):
             self._autoscale_settings['response_time_low'] = response_time_low
         else:
             raise ConfigException("Response time low score must be a int value, over than 0 (you indicate {0})".format(response_time_low))
@@ -155,7 +187,7 @@ class HAConf:
         Argument:
         - response_time_high: The response time High Score
         """
-        if(isinstance(response_time_high, int) and response_time_high >= 0):
+        if(response_time_high >= 0):
             self._autoscale_settings['response_time_high'] = response_time_high
         else:
             raise ConfigException("Response time high score must be a int value, over than 0 (you indicate {0})".format(response_time_high))
@@ -211,10 +243,10 @@ class HAConf:
         Argument:
         - response_time_low: The response time trend Low Score
         """
-        if(isinstance(response_time_trend_low, float) and response_time_trend_low != 0):
+        if(isinstance(response_time_trend_low, float) and response_time_trend_low >= 0 and response_time_trend_low <= 1):
             self._autoscale_settings['response_time_trend_low'] = response_time_trend_low
         else:
-            raise ConfigException("Response time low trend score must be a float value, different than 0 (you indicate {0})".format(response_time_trend_low))
+            raise ConfigException("Response time low trend score must be a float value, between 0 and 1 (you indicate {0})".format(response_time_trend_low))
     
     def getResponseTimeTrendLow(self):
         """Get the response time trend Low Score
@@ -233,10 +265,10 @@ class HAConf:
         Argument:
         - response_time_high: The response time trend High Score
         """
-        if(isinstance(response_time_trend_high, float) and response_time_trend_high != 0):
+        if(isinstance(response_time_trend_high, float) and response_time_trend_high >= 0 and response_time_trend_high <= 1):
             self._autoscale_settings['response_time_trend_high'] = response_time_trend_high
         else:
-            raise ConfigException("Response time high trend score must be a float value, different than 0 (you indicate {0})".format(response_time_trend_high))
+            raise ConfigException("Response time high trend score must be a float value, between 0 and 1 (you indicate {0})".format(response_time_trend_high))
     
     def getResponseTimeTrendHigh(self):
         """Get the response time trend High Score

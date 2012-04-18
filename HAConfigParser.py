@@ -64,6 +64,16 @@ class HAConfigParser:
         else:
             raise ConfigException("You must provide a Pingdom API Key (section 'PINGDOM_INFOS', key 'api_key')")
         
+        if(config.has_option('PINGDOM_INFOS', 'login')):
+            ha_conf.setPingdomLogin(config.get('PINGDOM_INFOS', 'login'))
+        else:
+            raise ConfigException("You must provide a Pingdom login (section 'PINGDOM_INFOS', key 'login')")
+        
+        if(config.has_option('PINGDOM_INFOS', 'password')):
+            ha_conf.setPingdomPassword(config.get('PINGDOM_INFOS', 'password'))
+        else:
+            raise ConfigException("You must provide a Pingdom password (section 'PINGDOM_INFOS', key 'password')")
+        
         if(config.has_option('PINGDOM_INFOS', 'check_id')):
             ha_conf.setPingdomCheckId(config.get('PINGDOM_INFOS', 'check_id'))
         else:
@@ -83,14 +93,14 @@ class HAConfigParser:
             if(config.has_option('AUTOSCALE_SETTINGS', 'max_dynos')):
                 ha_conf.setMaxDynos(config.getint('AUTOSCALE_SETTINGS', 'max_dynos'))
             if(config.has_option('AUTOSCALE_SETTINGS', 'response_time_low')):
-                ha_conf.setResponseTimeLow(config.getfloat('AUTOSCALE_SETTINGS', 'response_time_low'))
+                ha_conf.setResponseTimeLow(config.getint('AUTOSCALE_SETTINGS', 'response_time_low'))
             if(config.has_option('AUTOSCALE_SETTINGS', 'response_time_high')):
-                ha_conf.setResponseTimeHigh(config.getfloat('AUTOSCALE_SETTINGS', 'response_time_high'))
+                ha_conf.setResponseTimeHigh(config.getint('AUTOSCALE_SETTINGS', 'response_time_high'))
             if(config.has_option('AUTOSCALE_SETTINGS', 'check_frequency')):
-                ha_conf.setCheckFrequency(config.getfloat('AUTOSCALE_SETTINGS', 'check_frequency'))
+                ha_conf.setCheckFrequency(config.getint('AUTOSCALE_SETTINGS', 'check_frequency'))
             if(config.has_option('AUTOSCALE_SETTINGS', 'pingdom_check_period')):
-                ha_conf.setCheckFrequency(config.getfloat('AUTOSCALE_SETTINGS', 'pingdom_check_period'))
-            if(config.has_option('AUTOSCALE_SETTINGS', 'time_response_trend_low')):
+                ha_conf.setCheckFrequency(config.getint('AUTOSCALE_SETTINGS', 'pingdom_check_period'))
+            if(config.has_option('AUTOSCALE_SETTINGS', 'response_time_trend_low')):
                 ha_conf.setResponseTimeTrendLow(config.getfloat('AUTOSCALE_SETTINGS', 'response_time_trend_low'))
-            if(config.has_option('AUTOSCALE_SETTINGS', 'time_response_trend_high')):
+            if(config.has_option('AUTOSCALE_SETTINGS', 'response_time_trend_high')):
                 ha_conf.setResponseTimeTrendHigh(config.getfloat('AUTOSCALE_SETTINGS', 'response_time_trend_high'))
