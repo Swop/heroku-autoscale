@@ -99,7 +99,7 @@ class HAConfigParser:
             if(config.has_option('AUTOSCALE_SETTINGS', 'check_frequency')):
                 ha_conf.setCheckFrequency(config.getint('AUTOSCALE_SETTINGS', 'check_frequency'))
             if(config.has_option('AUTOSCALE_SETTINGS', 'pingdom_check_period')):
-                ha_conf.setCheckFrequency(config.getint('AUTOSCALE_SETTINGS', 'pingdom_check_period'))
+                ha_conf.setPingdomCheckPeriod(config.getint('AUTOSCALE_SETTINGS', 'pingdom_check_period'))
             if(config.has_option('AUTOSCALE_SETTINGS', 'response_time_trend_low')):
                 ha_conf.setResponseTimeTrendLow(config.getfloat('AUTOSCALE_SETTINGS', 'response_time_trend_low'))
             if(config.has_option('AUTOSCALE_SETTINGS', 'response_time_trend_high')):

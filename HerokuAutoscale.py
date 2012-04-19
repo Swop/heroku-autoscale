@@ -58,7 +58,9 @@ class HerokuAutoscale:
         rep_time_trend = self._getResponseTimeTrend(checks)
         self._log("resp time trend: {0}".format(rep_time_trend))
         
-        Plot.plot(checks, rep_time_avg, rep_time_trend, self._conf.getResponseTimeLow(), self._conf.getResponseTimeHigh())
+        t = datetime.now()
+        
+        Plot.plot(checks, rep_time_avg, rep_time_trend, self._conf.getResponseTimeLow(), self._conf.getResponseTimeHigh(), "/tmp/" + t.strftime("%d-%m-%Y_%H-%M-%S") + "_out.png")
         
         if(rep_time_avg < self._conf.getResponseTimeLow()):
             if(rep_time_trend < 0):
@@ -68,10 +70,11 @@ class HerokuAutoscale:
         elif(rep_time_avg >= self._conf.getResponseTimeLow() and 
              rep_time_avg < self._conf.getResponseTimeHigh()):
             
+            self._log("Delta response time: {0}".format(rep_time_trend * self._conf.getCheckFrequency() * 60))
             delta_rep_time_bounds = self._conf.getResponseTimeHigh() - self._conf.getResponseTimeLow()
-            if(rep_time_trend > self._conf.getResponseTimeTrendHigh() * delta_rep_time_bounds):
+            if(rep_time_trend * self._conf.getCheckFrequency() * 60 > self._conf.getResponseTimeTrendHigh() * delta_rep_time_bounds):
                 self._addDyno()
-            elif(rep_time_trend < -1. * (self._conf.getResponseTimeTrendLow() * delta_rep_time_bounds)):
+            elif(rep_time_trend * self._conf.getCheckFrequency() * 60 < -1. * (self._conf.getResponseTimeTrendLow() * delta_rep_time_bounds)):
                 self._removeDyno()
             else:
                 self._log("Do nothing...")
@@ -90,10 +93,11 @@ class HerokuAutoscale:
         self._register_signal(signal.SIGINT)
         self._register_signal(signal.SIGTERM)
         
+        self._log("CheckFrequency: %s" % str(int(self._conf.getCheckFrequency()) * 60))
         while(True):
             self.autoscale()
             time.sleep(self._conf.getCheckFrequency() * 60)
-        
+            
     def _register_signal(self, signum):
         """Register a system SIG number to catch in the program
         """
