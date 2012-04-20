@@ -1,0 +1,188 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Heroku-autoscale by Swop</title>
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+    <script src="javascripts/respond.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <!--[if lt IE 8]>
+    <link rel="stylesheet" href="stylesheets/ie.css">
+    <![endif]-->
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+
+  </head>
+  <body>
+
+      <div id="header">
+        <nav>
+          <li class="fork"><a href="https://github.com/Swop/heroku-autoscale">Fork On GitHub</a></li>
+          <li class="downloads"><a href="https://github.com/Swop/heroku-autoscale/zipball/master">ZIP</a></li>
+          <li class="downloads"><a href="https://github.com/Swop/heroku-autoscale/tarball/master">TAR</a></li>
+          <li class="title">DOWNLOADS</li>
+        </nav>
+      </div><!-- end header -->
+
+    <div class="wrapper">
+
+      <section>
+        <div id="title">
+          <h1>Heroku-autoscale</h1>
+          <p>An autoscaling python script for Heroku</p>
+          <hr>
+          <span class="credits left">Project maintained by <a href="https://github.com/Swop">Swop</a></span>
+          <span class="credits right">Hosted on GitHub Pages &mdash; Theme by <a href="http://twitter.com/#!/michigangraham">mattgraham</a></span>
+        </div>
+
+        <h1>heroku-autoscale</h1>
+
+<h2>An autoscaling python script for Heroku</h2>
+
+<p>This python daemon use <a href="https://github.com/heroku/heroku.py">Heroku official python API</a> and <a href="http://pingdom.com/services/api/">Pingdom API</a> to automatically scale your Heroku app depending on the dyno's load.</p>
+
+<p><strong>You first need to install Heroku API before playing with this script.</strong></p>
+
+<hr><h3>First: Install heroku API</h3>
+
+<p>Follow the instructions from the <a href="https://github.com/heroku/heroku.py">Heroku official python API GitHub page</a> to install Heroku library.</p>
+
+<p>The idea is to use Python's PIP to enable the lib in the whole system.</p>
+
+<hr><h3>Then: Configuring &amp; using heroku-autoscale</h3>
+
+<p>Heroku-autoscale was created as a standalone daemon. It just scale your app automatically, depending on the parameters you set and the performance of your app facing the traffic.</p>
+
+<h4>Edit your config.ini file</h4>
+
+<p>The daemon will autoscale your app depending on some parameters you can tweak in a <code>config.ini</code> file (you can copy the sample file <code>config.sample.ini</code> and fill it with your parameters) :</p>
+
+<pre><code>[HEROKU_INFOS]
+api_key: MY_HEROKU_API_KEY
+app_name: MY_APP_NAME
+
+[PINGDOM_INFOS]
+api_key: MY_PINGDOM_API_KEY
+login: MY_PINGDOM_LOGIN
+password: MY_PINGDOM_PASSWORD
+check_id: MY_PINGDOM_CHECK_ID
+
+[AUTOSCALE_SETTINGS]
+min_dynos: 1
+max_dynos: 10
+response_time_low: 500
+response_time_high: 2000
+check_frequency: 5
+pingdom_check_period: 30
+response_time_trend_low: 0.5
+response_time_trend_high: 0.5
+plot: False
+graphs_folder: /tmp
+debug: False
+</code></pre>
+
+<p><strong>Heroku parameters:</strong></p>
+
+<ul>
+<li>
+<code>api_key</code>: Your Heroku API key</li>
+<li>
+<code>app_name</code>: The name of the Heroku application you want to auto-scale</li>
+</ul><p><strong>Pingdom parameters:</strong></p>
+
+<ul>
+<li>
+<code>api_key</code>: Your Pingdom API key</li>
+<li>
+<code>login</code>: Your Pingdom login (aka your email)</li>
+<li>
+<code>password</code>: Your Pingdom password</li>
+<li>
+<code>check_id</code>: The ID of the Pingdom check which monitor your application</li>
+</ul><p><strong>Autoscale parameters:</strong></p>
+
+<ul>
+<li>
+<code>min_dynos</code>: The autoscale app will not scale down the Heroku app under that number of dynos</li>
+<li>
+<code>man_dynos</code>: The autoscale app will not scale up the Heroku app over that number of dynos</li>
+<li>
+<code>response_time_low</code>: If the measured response time is below this number, the Heroku app will be scaled up</li>
+<li>
+<code>response_time_high</code>: If the measured response time is over this number, the Heroku app will be scaled down</li>
+<li>
+<code>check_frequency</code>: The check frequency</li>
+<li>
+<code>pingdom_check_period</code>: The period of time you want to use from Pingdom website</li>
+<li>
+<code>response_time_trend_low</code>: If the measured response time is between the <code>response_time_low</code> and the <code>response_time_high</code> bounds, the app will loose a dyno if the the coeficent of the linear regression model is under this value</li>
+<li>
+<code>response_time_trend_high</code>: If the measured response time is between the <code>response_time_low</code> and the <code>response_time_high</code> bounds, the app will gain a dyno if the the coeficent of the linear regression model is over this value</li>
+<li>
+<code>plot</code>: If enabled, each autoscale step will plot a graph with the response times, the average response time, the response time bounds and the linear regression model of the scatter graph</li>
+<li>
+<code>graphs_folder</code>: The destination of the plotted graphs</li>
+<li>
+<code>debug</code>: The Heroku app will not be scaleid but the scaling decisions will be made and logged (and eventually the graphs will be plotted). You must have installed <code>python-gnuplot</code> to use this feature</li>
+</ul><h4>
+<em>Optional</em> - Edit and install the daemon init.d script</h4>
+
+<p>This script was designed to be used as a daemon. You must want to have an <code>init.d</code> script to manage the daemon.</p>
+
+<p>An <code>init.d</code> script had allready been written for you: <code>heroku-autoscale</code></p>
+
+<p>Start by editing this file and change the path of the daemon script:</p>
+
+<pre><code>[...]
+# !! CHANGE THIS LINE WITH YOUR REAL DEAMON'S PATH !!
+DAEMON_EXEC="/home/sylvain/Projets/Heroku/heroku-autoscale/HerokuAutoscaleDaemon.py"
+[...]
+</code></pre>
+
+<p>And then, copy the script into the <code>init.d</code> folder:</p>
+
+<pre><code>root# cp heroku-autoscale /etc/init.d
+</code></pre>
+
+<hr><h3>Finally: Let's have some fun!</h3>
+
+<p>Launch heroku-autoscale, forget about manually scale your app!</p>
+
+<p><strong>If you have installed the init.d script:</strong></p>
+
+<pre><code>root# /etc/init.d/heroku-autoscale start
+</code></pre>
+
+<p><strong>Or if you wanna use the python script directly:</strong></p>
+
+<pre><code>root# python HerokuAutoscaleDaemon.py
+</code></pre>
+
+<p>You can tweak some parameters, like the UID, GID, logfiles... by adding some args the the command. Type <code>python HerokuAutoscaleDaemon.py --help</code> to know how to use it.</p>
+
+<hr><p><strong>Just don't forget to monitor your website…</strong> Even if I do my best to make this script working, you should keep an eye on the performance of your app, and take control if needed before your app crash due to an auto-scaling error…</p>
+
+<hr><p>Have fun!</p>
+
+<p><a href="https://github.com/Swop"><strong>Swop</strong></a></p>
+      </section>
+
+    </div>
+    <!--[if !IE]><script>fixScale(document);</script><!--<![endif]-->
+              <script type="text/javascript">
+            var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+            document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+          </script>
+          <script type="text/javascript">
+            try {
+              var pageTracker = _gat._getTracker("UA–31065066–1");
+            pageTracker._trackPageview();
+            } catch(err) {}
+          </script>
+
+  </body>
+</html>
