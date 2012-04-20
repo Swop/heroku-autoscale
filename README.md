@@ -1,7 +1,7 @@
 # heroku-autoscale
 
 
-## An autoscaling python script for Heorku
+## An autoscaling python script for Heroku
 This python daemon use [Heroku official python API](https://github.com/heroku/heroku.py) and [Pingdom API](http://pingdom.com/services/api/) to automatically scale your Heroku app depending on the dyno's load.
 
 **You first need to install Heroku API before playing with this script.**
