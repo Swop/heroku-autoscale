@@ -1,0 +1,9 @@
+.project
+.pydevproject
+.settings
+
+*.pyc
+
+config.ini
+Test.py
+out.png
