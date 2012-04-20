@@ -1,9 +1,10 @@
-"""Define the class representing a Pingdom check result object.
+"""
+Define the class representing a Pingdom check result object.
+By Sylvain MAUDUIT (Swop)
 """
 
 class PingdomCheck:
-    """This class represent a Pingdom API check result.
-    """
+    """This class represent a Pingdom API check results"""
 
     def __init__(self, probe_id, time, probe_status, response_time, status_desc, status_long_desc):
         """Initialize the PingDom API Check object.
@@ -49,6 +50,7 @@ class PingdomCheck:
     
     @staticmethod
     def getArrayData(checks):
+        """Return the sorted times and response times lists"""
         x = checks.keys()
         x.sort()
         y = []

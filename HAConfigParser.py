@@ -1,3 +1,8 @@
+"""
+Define a class used to parse a Heroku-Autoscale config file
+By Sylvain MAUDUIT (Swop)
+"""
+
 import ConfigParser
 from ConfigException import ConfigException
 from HAConf import HAConf

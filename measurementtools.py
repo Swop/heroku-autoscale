@@ -1,3 +1,8 @@
+"""
+Some functions to compute data from Pingdom checks data
+By Sylvain MAUDUIT (Swop)
+"""
+
 from pingdom.pingdomcheck import PingdomCheck
 
 def getResponseTimeAvg(checks):
@@ -13,22 +18,6 @@ def getResponseTimeAvg(checks):
         avg += resp_time
     avg /= len(x)
     return avg
-    
-#def getResponseTimeTrend(checks):
-#    """Return the global leading coefficient of the response time graph.
-#    
-#    Arguments:
-#    - checks: A dictionary (key: check time) of pingdomcheck.PingdomCheck objects
-#    """
-#    x, y = PingdomCheck.getArrayData(checks)
-#    
-#    check_count = len(x)
-#    global_coef = 0
-#    
-#    for i in range(check_count - 1):
-#        global_coef += (y[i+1] - y[i]) / (x[i+1] - x[i])
-#    
-#    return global_coef
 
 def computeLinearRegressionModel(checks):
     """Compute a linear regression model for experimental measures.
@@ -38,7 +27,7 @@ def computeLinearRegressionModel(checks):
     Arguments:
     - x, y : vectors (lists) of measures
     
-    Return: [a, b], the coefficient of the inear regression model
+    Return: [a, b], the coefficient of the linear regression model
     """
     
     def sum_vector(n, x):

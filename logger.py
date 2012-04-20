@@ -4,6 +4,7 @@ This class allows to create objects that would be used as standard
 and error output. Behind it are files so the message writen in it
 will be writen in a file.
 
+By Sylvain MAUDUIT (Swop)
 """
 
 from datetime import datetime

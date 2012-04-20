@@ -1,6 +1,8 @@
 #!/usr/bin/python
 
-"""This module define the HerokuAutoscaleDaemon class 
+"""
+This module define the HerokuAutoscaleDaemon class
+By Sylvain MAUDUIT (Swop)
 """
 
 import sys
