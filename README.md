@@ -8,7 +8,7 @@ This python daemon use [Heroku official python API](https://github.com/heroku/he
 
 ---
 ### First: Install heroku API
-Follow the instruction from the [Heroku official python API GitHub page](https://github.com/heroku/heroku.py) to install Heroku library.
+Follow the instructions from the [Heroku official python API GitHub page](https://github.com/heroku/heroku.py) to install Heroku library.
 
 The idea is to use Python's PIP to enable the lib in the whole system.
 
@@ -66,7 +66,7 @@ The daemon will autoscale your app depending on some parameters you can tweak in
 * `response_time_trend_high`: If the measured response time is between the `response_time_low` and the `response_time_high` bounds, the app will gain a dyno if the the coeficent of the linear regression model is over this value
 * `plot`: If enabled, each autoscale step will plot a graph with the response times, the average response time, the response time bounds and the linear regression model of the scatter graph
 * `graphs_folder`: The destination of the plotted graphs
-* `debug`: The Heroku app will not be scale but the scaling decisions will be made and logged (and eventually the graphs will be plotted). You must have installed `python-gnuplot` to use this feature
+* `debug`: The Heroku app will not be scaleid but the scaling decisions will be made and logged (and eventually the graphs will be plotted). You must have installed `python-gnuplot` to use this feature
 
 #### *Optional* - Edit and install the daemon init.d script
 This script was designed to be used as a daemon. You must want to have an `init.d` script to manage the daemon.
@@ -98,7 +98,7 @@ Launch heroku-autoscale, forget about manually scale your app!
 You can tweak some parameters, like the UID, GID, logfiles... by adding some args the the command. Type `python HerokuAutoscaleDaemon.py --help` to know how to use it.
 
 ---
-**Just don't forget to monitor your website…** Even if I do my best to make this script work, you should keep an eye to the performance of your app, and take control if needed before your app crash due to an auto-scaling error…
+**Just don't forget to monitor your website…** Even if I do my best to make this script working, you should keep an eye on the performance of your app, and take control if needed before your app crash due to an auto-scaling error…
 
 ---
 Have fun!
