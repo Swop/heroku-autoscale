@@ -104,3 +104,9 @@ class HAConfigParser:
                 ha_conf.setResponseTimeTrendLow(config.getfloat('AUTOSCALE_SETTINGS', 'response_time_trend_low'))
             if(config.has_option('AUTOSCALE_SETTINGS', 'response_time_trend_high')):
                 ha_conf.setResponseTimeTrendHigh(config.getfloat('AUTOSCALE_SETTINGS', 'response_time_trend_high'))
+            if(config.has_option('AUTOSCALE_SETTINGS', 'plot')):
+                ha_conf.setPlotting(config.getboolean('AUTOSCALE_SETTINGS', 'plot'))
+            if(config.has_option('AUTOSCALE_SETTINGS', 'graphs_folder')):
+                ha_conf.setGraphsFolder(config.get('AUTOSCALE_SETTINGS', 'graphs_folder'))
+            if(config.has_option('AUTOSCALE_SETTINGS', 'debug')):
+                ha_conf.setDebugMode(config.getboolean('AUTOSCALE_SETTINGS', 'debug'))

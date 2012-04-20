@@ -46,3 +46,12 @@ class PingdomCheck:
     def get_status_desc_long(self):
         """Return a long description of the result of the check"""
         return self._status_desc_long
+    
+    @staticmethod
+    def getArrayData(checks):
+        x = checks.keys()
+        x.sort()
+        y = []
+        for time in x:
+            y.append(checks[time].get_response_time())
+        return x, y

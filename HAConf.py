@@ -1,4 +1,5 @@
 from ConfigException import ConfigException
+import os
 
 class HAConf:
     """Object representation of the config file.
@@ -24,7 +25,11 @@ class HAConf:
                                    'check_frequency': 5,
                                    'pingdom_check_period': 30,
                                    'response_time_trend_low': -0.5,
-                                   'response_time_trend_high': 0.5
+                                   'response_time_trend_high': 0.5,
+                                   'plot': False,
+                                   'graphs_folder': '/tmp',
+                                   'debug': False
+                                   
         }
     
     def setHerokuAPIKey(self, heroku_api_key):
@@ -243,10 +248,10 @@ class HAConf:
         Argument:
         - response_time_low: The response time trend Low Score
         """
-        if(isinstance(response_time_trend_low, float) and response_time_trend_low >= 0 and response_time_trend_low <= 1):
+        if(isinstance(response_time_trend_low, float) and response_time_trend_low <= 0):
             self._autoscale_settings['response_time_trend_low'] = response_time_trend_low
         else:
-            raise ConfigException("Response time low trend score must be a float value, between 0 and 1 (you indicate {0})".format(response_time_trend_low))
+            raise ConfigException("Response time low trend score must be a negative float value (you indicate {0})".format(response_time_trend_low))
     
     def getResponseTimeTrendLow(self):
         """Get the response time trend Low Score
@@ -265,10 +270,10 @@ class HAConf:
         Argument:
         - response_time_high: The response time trend High Score
         """
-        if(isinstance(response_time_trend_high, float) and response_time_trend_high >= 0 and response_time_trend_high <= 1):
+        if(isinstance(response_time_trend_high, float) and response_time_trend_high >= 0):
             self._autoscale_settings['response_time_trend_high'] = response_time_trend_high
         else:
-            raise ConfigException("Response time high trend score must be a float value, between 0 and 1 (you indicate {0})".format(response_time_trend_high))
+            raise ConfigException("Response time high trend score must be a positive float value (you indicate {0})".format(response_time_trend_high))
     
     def getResponseTimeTrendHigh(self):
         """Get the response time trend High Score
@@ -278,3 +283,66 @@ class HAConf:
         Return: The response time trend high Score
         """
         return self._autoscale_settings['response_time_trend_high']
+    
+    def setPlotting(self, plotting):
+        """Enable graphs plotting
+        
+        If enabled, each autoscale step will plot a graph with the response times, the average response time, the response time bounds and the linear regression model of the scatter graph
+        
+        Argument:
+        - plotting: True/False : enable or disable graphs plotting
+        """
+        if(isinstance(plotting, bool)):
+            self._autoscale_settings['plot'] = plotting
+        else:
+            raise ConfigException("'Plot' value must be boolean (you indicate {0})".format(plotting))
+        
+    def isPlotting(self):
+        """Inform if the graphs plotting is enabled
+        
+        Return: True/False depending if the graphs plotting is enabled or not
+        """
+        return  self._autoscale_settings['plot']
+    
+    def setGraphsFolder(self, graphs_folder):
+        """Set the destination folder for the plotted graphs
+        
+        Argument:
+        - graphs_folder: The destination of the plotted graphs
+        """
+        graphs_folder = os.path.realpath(str(graphs_folder))
+        if os.access(graphs_folder, os.F_OK) and (not \
+                os.access(graphs_folder, os.R_OK) or not \
+                os.access(graphs_folder, os.W_OK)):
+            raise ConfigException("Can't read/write in the given directory: {0}".format(graphs_folder))
+        elif not os.access(graphs_folder, os.F_OK):
+            raise ConfigException("The given directory doesn't exists: {0}".format(graphs_folder))
+        
+        self._autoscale_settings['graphs_folder'] = graphs_folder
+        
+    def getGraphsFolder(self):
+        """Get the destination folder for the plotted graphs
+        
+        Return: The destination folder for the plotted graphs
+        """
+        return  self._autoscale_settings['graphs_folder']
+    
+    def setDebugMode(self, debug):
+        """Place/take off the application in/from debug mode
+        
+        The Heroku app will not be scale but the scaling decisions will be made and logged (and eventually the graphs will be plotted).
+        
+        Argument:
+        - debug: True/False: Enabled/Disabled the debug mode
+        """
+        if(isinstance(debug, bool)):
+            self._autoscale_settings['debug'] = debug
+        else:
+            raise ConfigException("'debug' value must be boolean (you indicate {0})".format(debug))
+        
+    def isInDebugMode(self):
+        """Inform if the application is in debug mode or not
+        
+        Return: True/False depending if the application is in debug mode or not 
+        """
+        return  self._autoscale_settings['debug']

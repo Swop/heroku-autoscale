@@ -6,6 +6,7 @@ from Plot import Plot
 from HAConfigParser import HAConfigParser
 from pingdom.pingdomapi import PingdomAPIWrapper
 from datetime import datetime, timedelta
+from measurementtools import *
 
 def log(msg):
     """Log something into the logger "info" channel
@@ -53,33 +54,33 @@ class HerokuAutoscale:
         self._log("begin: {0}, end: {1}".format(begin.isoformat(), end.isoformat()))
         checks = self._pd_wrapper.getChecks(self._conf.getPingdomCheckId(), begin_time, end_time)
         
-        rep_time_avg = self._getResponseTimeAvg(checks)
+        rep_time_avg = getResponseTimeAvg(checks)
         self._log("avg resp time: {0}".format(rep_time_avg))
-        rep_time_trend = self._getResponseTimeTrend(checks)
-        self._log("resp time trend: {0}".format(rep_time_trend))
         
         t = datetime.now()
         
-        Plot.plot(checks, rep_time_avg, rep_time_trend, self._conf.getResponseTimeLow(), self._conf.getResponseTimeHigh(), "/tmp/" + t.strftime("%d-%m-%Y_%H-%M-%S") + "_out.png")
+        reg_coef = computeLinearRegressionModel(checks)
+        self._log("Linear regression: y' = a * x + b with a = {0}, b = {1}".format(reg_coef[0], reg_coef[1]))
+        
+        if(self._conf.isPlotting()):
+            Plot.plot(checks, rep_time_avg, reg_coef, self._conf.getResponseTimeLow(), self._conf.getResponseTimeHigh(), self._conf.getGraphsFolder() + '/' + t.strftime("%d-%m-%Y_%H-%M-%S") + "_out.ps")
         
         if(rep_time_avg < self._conf.getResponseTimeLow()):
-            if(rep_time_trend < 0):
+            if(reg_coef[0] < 0):
                 self._removeDyno()
             else:
                 self._log("Do nothing...")
         elif(rep_time_avg >= self._conf.getResponseTimeLow() and 
              rep_time_avg < self._conf.getResponseTimeHigh()):
             
-            self._log("Delta response time: {0}".format(rep_time_trend * self._conf.getCheckFrequency() * 60))
-            delta_rep_time_bounds = self._conf.getResponseTimeHigh() - self._conf.getResponseTimeLow()
-            if(rep_time_trend * self._conf.getCheckFrequency() * 60 > self._conf.getResponseTimeTrendHigh() * delta_rep_time_bounds):
+            if(reg_coef[0] > self._conf.getResponseTimeTrendHigh()):
                 self._addDyno()
-            elif(rep_time_trend * self._conf.getCheckFrequency() * 60 < -1. * (self._conf.getResponseTimeTrendLow() * delta_rep_time_bounds)):
+            elif(reg_coef[0] < self._conf.getResponseTimeTrendLow()):
                 self._removeDyno()
             else:
                 self._log("Do nothing...")
         else:
-            if(rep_time_trend > 0):
+            if(reg_coef[0] > 0):
                 self._addDyno()
             else:
                 self._log("Do nothing...")
@@ -122,7 +123,8 @@ class HerokuAutoscale:
         
         if(new_scale != current_dynos):
             self._log("New scale ({0}) != current syno ({1}) --> Scale to New scale ({0})".format(new_scale, current_dynos))
-            #self._heroku_app.processes['web'].scale(current_dynos)
+            if(not self._conf.isInDebugMode()):
+                self._heroku_app.processes['web'].scale(current_dynos)
         
     def _removeDyno(self, count=1):
         """Scale down the Heroku app
@@ -137,43 +139,8 @@ class HerokuAutoscale:
         
         if(new_scale != current_dynos):
             self._log("New scale ({0}) != current syno ({1}) --> Scale to New scale ({0})".format(new_scale, current_dynos))
-            #self._heroku_app.processes['web'].scale(current_dynos)
-            
-    def _getResponseTimeAvg(self, checks):
-        """Return the average of the response times
-        
-        Arguments:
-        - checks: A dictionary (key: check time) of pingdomcheck.PingdomCheck objects
-        """
-        times = checks.keys()
-        times.sort()
-        
-        avg = 0
-        for time in times:
-            check = checks[time]
-            avg += check.get_response_time()
-        avg /= len(checks.keys())
-        return avg
-        
-    def _getResponseTimeTrend(self, checks):
-        """Return the global leading coefficient of the response time graph.
-        
-        Arguments:
-        - checks: A dictionary (key: check time) of pingdomcheck.PingdomCheck objects
-        """
-        times = checks.keys()
-        times.sort()
-        
-        check_count = len(checks.keys())
-        
-        global_coef = 0
-        for i in range(check_count-1):
-            current_check = checks[times[i]]
-            next_check = checks[times[i+1]]
-            
-            global_coef += (next_check.get_response_time() - current_check.get_response_time()) / (next_check.get_time() - current_check.get_time())
-        
-        return global_coef
+            if(not self._conf.isInDebugMode()):
+                self._heroku_app.processes['web'].scale(current_dynos)
     
     def _getCurrentDynos(self):
         """Return the current Heroku app dyno number
@@ -187,6 +154,5 @@ class HerokuAutoscale:
     def _log(self, msg):
         """Log something into the logger "info" channel
         """
-        #print(datetime.now().isoformat(" ")+" "+msg)
         print(msg)
         sys.stdout.flush()
