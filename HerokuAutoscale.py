@@ -77,28 +77,35 @@ class HerokuAutoscale:
         reg_coef = computeLinearRegressionModel(checks)
         self._log("Linear regression: y' = a * x + b with a = {0}, b = {1}".format(reg_coef[0], reg_coef[1]))
         
-        if(self._conf.isPlotting()):
-            Plot.plot(checks, rep_time_avg, reg_coef, self._conf.getResponseTimeLow(), self._conf.getResponseTimeHigh(), self._conf.getGraphsFolder() + '/' + t.strftime("%d-%m-%Y_%H-%M-%S") + "_out.ps")
-        
         if(rep_time_avg < self._conf.getResponseTimeLow()):
             if(reg_coef[0] < 0):
                 self._removeDyno()
+                settlement = "Revove dyno"
             else:
                 self._log("===> Do nothing...")
+                settlement = "Do nothing"
         elif(rep_time_avg >= self._conf.getResponseTimeLow() and 
              rep_time_avg < self._conf.getResponseTimeHigh()):
             
             if(reg_coef[0] > self._conf.getResponseTimeTrendHigh()):
                 self._addDyno()
+                settlement = "Add dyno"
             elif(reg_coef[0] < self._conf.getResponseTimeTrendLow()):
                 self._removeDyno()
+                settlement = "Revove dyno"
             else:
                 self._log("===> Do nothing...")
+                settlement = "Do nothing"
         else:
             if(reg_coef[0] > 0):
                 self._addDyno()
+                settlement = "Add dyno"
             else:
                 self._log("===> Do nothing...")
+                settlement = "Do nothing"
+        
+        if(self._conf.isPlotting()):
+            Plot.plot(checks, rep_time_avg, reg_coef, self._conf.getResponseTimeLow(), self._conf.getResponseTimeHigh(), settlement, self._conf.getGraphsFolder() + '/' + t.strftime("%d-%m-%Y_%H-%M-%S") + "_out.ps")
             
     def autoscale_forever(self):
         """Start the infinite loop to automatically scale the Heroku app.
