@@ -63,7 +63,7 @@ class HerokuAutoscale:
         """
         self._log("----> Start autoscale...")
         end = datetime.utcnow()
-        end_time = int(time.mktime((datetime.now()).timetuple()))
+        end_time = int(time.mktime(end.timetuple()))
         begin = end - timedelta(minutes = self._conf.getPingdomCheckPeriod())
         begin_time =  int(time.mktime(begin.timetuple()))
         self._log("Pingdom period to request: Begin: {0}, End: {1}".format(begin.isoformat(), end.isoformat()))
