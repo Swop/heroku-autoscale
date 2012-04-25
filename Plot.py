@@ -11,7 +11,7 @@ class Plot(object):
     """
 
     @staticmethod
-    def plot(checks, rep_time_avg, reg_coef, response_time_low, response_time_high, file="out.ps", terminal="postscript"):
+    def plot(checks, rep_time_avg, reg_coef, response_time_low, response_time_high, settlement = "", file="out.ps", terminal="postscript"):
         """Plot a graph of the check results.
         
         Arguments:
@@ -20,6 +20,7 @@ class Plot(object):
         - reg_coef: The coefficient of the linear regression model
         - response_time_low: The lower bound of response time
         - response_time_high: The higher bound of response time
+        - settlement: (optional; default: blank string) The scaling decision to display on the graph
         - file: (optional; default: "out.ps") The destination path+filename of the plotted graph
         - terminal (optional; default: "postscript") The file type to use
         """
@@ -40,6 +41,8 @@ class Plot(object):
         lin_reg_graph = Gnuplot.Data(plot_times, reg_values, title='Resp. time tendency', with_='lines lc rgb "blue" lw 1')
 
         g = Gnuplot.Gnuplot()
+        if(settlement != ""):
+            g.set(title="Settlement: "+settlement)
         g.plot(checks_graph, average_graph, resp_time_low_graph, resp_time_high_graph, lin_reg_graph)
         
         g.xlabel('Time (s)')
