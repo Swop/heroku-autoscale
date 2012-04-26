@@ -7,17 +7,35 @@ This python daemon use [Heroku official python API](https://github.com/heroku/he
 **You first need to install Heroku API before playing with this script.**
 
 ---
-### First: Install heroku API
+### First: Install dependencies
+#### Heroku API
 Follow the instructions from the [Heroku official python API GitHub page](https://github.com/heroku/heroku.py) to install Heroku library.
 
-The idea is to use Python's PIP to enable the lib in the whole system.
+The idea is to use Python's PIP to enable the lib in the whole system :
+	sudo apt-get install python-pip
+	sudo pip install heroku
+
+#### Gnuplot & SimpleJSON
+In order to use Pingdom API and to plot graphs, heroku-autoscale needs `python-simplejson` and `python-gnuplot`:
+
+	sudo apt-get install python-simplejson python-gnuplot
 
 ---
 ### Then: Configuring & using heroku-autoscale
 Heroku-autoscale was created as a standalone daemon. It just scale your app automatically, depending on the parameters you set and the performance of your app facing the traffic.
 
 #### Edit your config.ini file
-The daemon will autoscale your app depending on some parameters you can tweak in a `config.ini` file (you can copy the sample file `config.sample.ini` and fill it with your parameters) :
+The daemon will autoscale your app depending on some parameters you can tweak in a `config.ini` file (you can copy the sample file `config.sample.ini` and fill it with your parameters).
+
+First, copy the sample file into /etc:
+
+	sudo mkdir -p /etc/heroku-autoscale/
+	sudo cp ./config.sample.ini /etc/heroku-autoscale/config.ini
+
+Then, edit your config file and fill it with yout parameters :
+
+	sudo vim /etc/heroku-autoscale/config.ini
+
 
 	[HEROKU_INFOS]
 	api_key: MY_HEROKU_API_KEY
