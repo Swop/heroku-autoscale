@@ -12,6 +12,7 @@ This python daemon use [Heroku official python API](https://github.com/heroku/he
 Follow the instructions from the [Heroku official python API GitHub page](https://github.com/heroku/heroku.py) to install Heroku library.
 
 The idea is to use Python's PIP to enable the lib in the whole system :
+
 	sudo apt-get install python-pip
 	sudo pip install heroku
 
