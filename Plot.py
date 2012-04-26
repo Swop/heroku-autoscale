@@ -41,12 +41,16 @@ class Plot(object):
         lin_reg_graph = Gnuplot.Data(plot_times, reg_values, title='Resp. time tendency', with_='lines lc rgb "blue" lw 1')
 
         g = Gnuplot.Gnuplot()
+        
+        g.set_string('output', file)
+        g('set terminal %s' % terminal)
+        
         if(settlement != ""):
             g.set(title="Settlement: "+settlement)
-        g.plot(checks_graph, average_graph, resp_time_low_graph, resp_time_high_graph, lin_reg_graph)
-        
+            
         g.xlabel('Time (s)')
         g.ylabel('Response time (ms)')
-        g.replot()
         
-        g.hardcopy(filename=file,terminal=terminal)
+        g.plot(checks_graph, average_graph, resp_time_low_graph, resp_time_high_graph, lin_reg_graph)
+                
+        #g.hardcopy(filename=file,terminal=terminal)
