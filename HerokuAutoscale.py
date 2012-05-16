@@ -105,7 +105,7 @@ class HerokuAutoscale:
                 settlement = "Do nothing"
         
         if(self._conf.isPlotting()):
-            Plot.plot(checks, rep_time_avg, reg_coef, self._conf.getResponseTimeLow(), self._conf.getResponseTimeHigh(), settlement, self._conf.getGraphsFolder() + '/' + t.strftime("%d-%m-%Y_%H-%M-%S") + "_out.ps")
+            Plot.plot(checks, rep_time_avg, reg_coef, self._conf.getResponseTimeLow(), self._conf.getResponseTimeHigh(), settlement, self._conf.getGraphsFolder() + '/' + t.strftime("%d-%m-%Y_%H-%M-%S") + "_out.pdf", "pdf")
             
     def autoscale_forever(self):
         """Start the infinite loop to automatically scale the Heroku app.
@@ -149,7 +149,7 @@ class HerokuAutoscale:
         if(new_scale != current_dynos):
             self._log("====> New scale ({0}) != current dyno ({1}) --> Scale to New scale ({0})".format(new_scale, current_dynos))
             if(not self._conf.isInDebugMode()):
-                self._heroku_app.processes['web'].scale(current_dynos)
+                self._heroku_app.processes['web'].scale(new_scale)
             return
         self._log("===> Do nothing...")
         
@@ -170,7 +170,7 @@ class HerokuAutoscale:
         if(new_scale != current_dynos):
             self._log("===> New scale ({0}) != current syno ({1}) --> Scale to New scale ({0})".format(new_scale, current_dynos))
             if(not self._conf.isInDebugMode()):
-                self._heroku_app.processes['web'].scale(current_dynos)
+                self._heroku_app.processes['web'].scale(new_scale)
             return
         self._log("===> Do nothing...")
     
